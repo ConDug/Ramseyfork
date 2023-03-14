@@ -56,7 +56,7 @@ numline=$(< $cube_file wc -l)
 new_index=$((numline-1))
 for i in $(seq 0 $new_index)
 do 
-    command="./simplification/adjoin-cube-simplify.sh $n $f $cube_file $i 50 >> $n-solve/$i-solve.log && ./maplesat-ks/simp/maplesat_static simplified-cube-instance/$cube_file$i.adj.simp -no-pre -exhaustive=$n.exhaust -order=$n >> $n-solve/$i-solve.log"
+    command="./simplification/adjoin-cube-simplify.sh $n $f $cube_file $i 50 >> $n-solve/$i-solve.log && ./maplesat-ks/simp/maplesat_static simplified-cube-instance/$cube_file$i.adj.simp -no-pre -minclause -no-pseudo-test -order=$n >> $n-solve/$i-solve.log"
     echo $command >> $n-solve/solve.commands
     if [ "$s" != "-s" ]
     then
