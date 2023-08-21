@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --account=def-vganesh
-#SBATCH --time=60:00:00
+#SBATCH --time=7-00:00
 #SBATCH --mem-per-cpu=4G
-#SBATCH --constraint=skylake
+
 
 while getopts "apsbm" opt
 do

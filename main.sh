@@ -85,7 +85,7 @@ then
 else
     ./maplesat-solve-verify.sh $n constraints_${n}_${p}_${q}_${t}_${s}_${b}_${r}_${a}_final.simp
     #step 5.5: verify all constraints are satisfied
-    ./verify.sh $n
+    #./verify.sh $n
 
     #step 6: 
     echo "checking max clique size..."

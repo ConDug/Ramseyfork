@@ -51,7 +51,7 @@ def generate_degree_clauses(X, lower, upper, start_var, cnf_file):
             clauses.append(gen_implication_clause({S[i-1][j]}, {S[i][j]}))
             clauses.append(gen_implication_clause({X[i-1], S[i-1][j-1]}, {S[i][j]}))
             clauses.append(gen_implication_clause({S[i][j]}, {S[i-1][j], X[i-1]}))
-            clauses.append(gen_implication_clause({S[i][j]}, {S[i-1][j], S[i-1][j-1]}))
+            clauses.append(gen_implication_clause({S[i][j]}, {S[i-1][j-1]}))
     clauses = [i for i in clauses if i is not None]
     clause_count=0
     
