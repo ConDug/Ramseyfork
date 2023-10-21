@@ -1,18 +1,25 @@
 #!/bin/bash
+#SBATCH --account=def-vganesh
+#SBATCH --time=10:00:00
+#SBATCH --mem-per-cpu=4G
 d=$1 #directory for iterative cubing
 v=$2 #initial amount of variables to eliminate during iterative cubing
 a=$3 #amount of additonal variable to eliminate in each cubing stage
 n=$4 #order
 
 cd $d
-
+echo $d
 cubetime=$(find . -type f -name "*.log" -exec grep -h "c time * *[0-9]*\.*[0-9]*" {} + | awk '{total += $(NF-1)} END {print total}')
+echo $cubetime 'cube'
 simptime=$(find . -type f -name "*.simp" -exec grep -h "c total process time since initialization: * *[0-9]*\.*[0-9]*" {} + | awk '{total += $(NF-1)} END {print total}')
-simptime2=$(find . -type f -name "*.log" -exec grep -h "c total process time since initialization: * *[0-9]*\.*[0-9]*" {} + | awk '{total += $(NF-1)} END {print total}')
+echo $simptime 'simp'
+#simptime2=$(find . -type f -name "*.log" -exec grep -h "c total process time since initialization: * *[0-9]*\.*[0-9]*" {} + | awk '{total += $(NF-1)} END {print total}')
 solvetime=$(find . -type f -name "*.log" -exec grep -h "CPU time * *[0-9]*\.*[0-9]*" {} + | awk '{total += $(NF-1)} END {print total}')
+echo $solve_time 'solve'
 verifytime=$(find . -type f -name "*.log" -exec grep -h "verification time: * *[0-9]*\.*[0-9]*" {} + | awk '{total += $(NF-1)} END {print total}')
-conflicts=$(find . -type f -name "*.log" -exec grep -h "conflicts             : * *[0-9]*\.*[0-9]*" {} + | awk '{total += $(NF-2)} END {print total}')
-total_cubes=$(find . -type f -name "*.cubes" -exec cat {} + | wc -l)
+echo $verifytime 'verify'
+#conflicts=$(find . -type f -name "*.log" -exec grep -h "conflicts             : * *[0-9]*\.*[0-9]*" {} + | awk '{total += $(NF-2)} END {print total}')
+#total_cubes=$(find . -type f -name "*.cubes" -exec cat {} + | wc -l)
 
 printf "%-15s %-15s %-15s %-15s %-15s\n" "cubing time" "cube simp time" "solve simp time" "solve time" "verify time"
 printf "%-15s %-15s %-15s %-15s %-15s\n" "${cubetime} secs" "${simptime} secs" "${simptime2} secs" "${solvetime} secs" "${verifytime} secs"
@@ -62,6 +69,6 @@ perform_verification() {
 
 
 directory_to_verify=$d/$v/$n-solve
-perform_verification "$directory_to_verify" $v $a
+#perform_verification "$directory_to_verify" $v $a
 
 echo "Total time wasted on solving: $time_wasted secs"
