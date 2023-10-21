@@ -1,9 +1,4 @@
 #!/bin/bash
-#SBATCH --account=def-vganesh
-#SBATCH --time=5:00:00
-#SBATCH --mem-per-cpu=4G
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=32
 
 n=$1 #order
 f=$2 #instance file name
@@ -39,14 +34,14 @@ else
     # Generate a random list of integers using Python
     random_list=$(python -c "import random; print([random.randint(1, $new_index) for _ in range(1000)])" -- "$new_index")
 
-    cubes_list=($random_list)
+    cubes_list=($(echo $random_list | tr -d '[],'))
 fi
-for i in $cubes_list
+for i in "${cubes_list[@]}"
 	do
 		echo $i
 	done
 
-for i in $(seq 1 $new_index) #1-based indexing for cubes
+for i in "${cubes_list[@]}" #1-based indexing for cubes
     do
         child_instance="$d/$v/simp/${highest_num}.cubes${i}.adj.simp"
         command1="./gen_cubes/apply.sh $f $cube_file $i > $d/$v/simp/$cube_file_name$i.adj"
@@ -54,15 +49,15 @@ for i in $(seq 1 $new_index) #1-based indexing for cubes
         command3="./maplesat-solve-verify.sh -l $n $d/$v/simp/$cube_file_name$i.adj.simp >> $d/$v/$n-solve/$i-solve.log"
         command4="if ! grep -q 'UNSATISFIABLE' '$d/$v/$n-solve/$i-solve.log'; then sbatch $child_instance-cube.sh; fi"
         #sbatch this line
-        command5="./gen_cubes/concat.sh $child_instance $child_instance.noncanonical > $child_instance.temp && ./gen_cubes/concat.sh $child_instance.temp $child_instance.unit | ./3-cube-merge-solve-iterative-learnt-cc.sh $n /dev/stdin '$d/$v-$i' $(($v + $a)) $t $a $(($highest_num+2)) $new_cube_file"
+        command5="./gen_cubes/concat.sh $child_instance $child_instance.noncanonical > $child_instance.temp && ./gen_cubes/concat.sh $child_instance.temp $child_instance.unit > $child_instance.learnt; ./3-cube-merge-solve-iterative-learnt-cc.sh $n $child_instance.learnt '$d/$v-$i' $(($v + $a)) $t $a"
         command="$command1 && $command2 && $command3"
         echo "#!/bin/bash" > $child_instance-solve.sh
         echo "#SBATCH --account=def-vganesh" >> $child_instance-solve.sh
-        echo "#SBATCH --time=24:00:00" >> $child_instance-solve.sh
+        echo "#SBATCH --time=16:00:00" >> $child_instance-solve.sh
         echo "#SBATCH --mem-per-cpu=4G" >> $child_instance-solve.sh
         echo "#!/bin/bash" > $child_instance-cube.sh
         echo "#SBATCH --account=def-vganesh" >> $child_instance-cube.sh
-        echo "#SBATCH --time=0-04:00" >> $child_instance-cube.sh
+        echo "#SBATCH --time=0-05:00" >> $child_instance-cube.sh
         echo "#SBATCH --mem-per-cpu=4G" >> $child_instance-cube.sh
         echo $command >> $child_instance-solve.sh
         echo $command4 >> $child_instance-solve.sh
