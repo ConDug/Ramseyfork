@@ -66,6 +66,7 @@ def generate(n, p, q,lower=0,upper=0, u_e_b=0, u_e_r=0):
 
     count=str(count)
     clause_count =str(clause_count+math.comb(n,p)+math.comb(n,q))
+
     proc1=subprocess.Popen(["./gen_instance/combine.sh",str(n), str(p), str(q), str(lower), str(upper), str(u_e_b), str(u_e_r), count, clause_count]) # call a bash file to combine cubic constraints and 1st line of cnf file
     proc1.wait()
 

@@ -31,7 +31,7 @@ then
     echo "MapleSAT will output short learnt clause"
     ./maplesat-ks/simp/maplesat_static $f $f.drat -perm-out=$f.perm -order=$n -no-pre -minclause -short-out=$f.unit -noncanonical-out=$f.noncanonical | tee $f.log #removed exhaustive here, -max-proof-size=3071
 else
-    ./maplesat-ks/simp/maplesat_static $f $f.drat -no-pseudo-test -perm-out=$f.perm -order=$n -exhaustive=exh.log -no-pre -minclause | tee $f.log #removed exhaustive here -no-pseudo-test
+    ./maplesat-ks/simp/maplesat_static $f $f.drat -no-pseudo-test -perm-out=$f.perm -order=$n -no-pre -minclause | tee $f.log #removed exhaustive here -no-pseudo-test
 fi
 
 # Verify DRAT proof

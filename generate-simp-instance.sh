@@ -48,7 +48,8 @@ then
 fi
 
 #step 3: generate instances
-./1-instance-generation.sh $n $p $q $lower $upper ${Edge_b}${Edge_r}
+echo 
+./1-instance-generation.sh $n $p $q $lower $upper ${Edge_b} ${Edge_r}
 
 instance_tracking=constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}
 

@@ -2,6 +2,7 @@ import itertools
 import math
 import csv
 
+
 def gen_implication_clause(a,b):
     clause=[]
     if 'F' in a or 'T' in b: #whole clause is T if any variable in is T
@@ -24,7 +25,7 @@ def gen_implication_clause(a,b):
 
 # Generate clauses encoding that between lower and upper variables in X are assigned true (using sequential counters)
 def generate_triangle_clauses(X, upper, start_var, cnf_file,colour):
-    global total_vars
+    #global total_vars
     clauses = []
     total_vars=start_var
     X=sorted(X)
@@ -72,11 +73,19 @@ def generate_triangle_clauses(X, upper, start_var, cnf_file,colour):
     # Generate clauses encoding cardinality constraint
     for i in range(1, n+1):
         for j in range(1, k+1):
-            clauses.append(gen_implication_clause({S[i-1][j]}, {S[i][j]}))
-            clauses.append(gen_implication_clause({mult*edge_dict[(X[i-1],missing_v[0])],mult*edge_dict[(X[i-1],missing_v[1])], S[i-1][j-1]}, {S[i][j]}))
-            clauses.append(gen_implication_clause({S[i][j]}, {S[i-1][j], mult*edge_dict[(X[i-1],missing_v[0])]}))
-            clauses.append(gen_implication_clause({S[i][j]}, {S[i-1][j], mult*edge_dict[(X[i-1],missing_v[1])]}))
-            clauses.append(gen_implication_clause({S[i][j]}, {S[i-1][j-1]}))
+            #clauses.append(gen_implication_clause({S[i-1][j]}, {S[i][j]}))
+            #clauses.append(gen_implication_clause({mult*edge_dict[(X[i-1],missing_v[0])],mult*edge_dict[(X[i-1],missing_v[1])], S[i-1][j-1]}, {S[i][j]}))
+            #clauses.append(gen_implication_clause({S[i][j]}, {S[i-1][j], mult*edge_dict[(X[i-1],missing_v[0])]}))
+            #clauses.append(gen_implication_clause({S[i][j]}, {S[i-1][j], mult*edge_dict[(X[i-1],missing_v[1])]}))
+            #clauses.append(gen_implication_clause({S[i][j]}, {S[i-1][j-1]}))
+            edge_0=edge_dict[(missing_v[0],missing_v[1])]
+            edge_1=edge_dict[(X[i-1],missing_v[0])]
+            edge_2=edge_dict[(X[i-1],missing_v[1])]
+            clauses.append(gen_implication_clause({mult*edge_0,S[i-1][j]}, {S[i][j]}))
+            clauses.append(gen_implication_clause({mult*edge_0,mult*edge_1,mult*edge_2, S[i-1][j-1]}, {S[i][j]}))
+            clauses.append(gen_implication_clause({mult*edge_0,S[i][j]}, {S[i-1][j], mult*edge_1}))
+            clauses.append(gen_implication_clause({mult*edge_0,S[i][j]}, {S[i-1][j], mult*edge_2}))
+            clauses.append(gen_implication_clause({mult*edge_0,S[i][j]}, {S[i-1][j-1]}))
     clauses = [i for i in clauses if i is not None]
     
     
@@ -91,5 +100,4 @@ def generate_triangle_clauses(X, upper, start_var, cnf_file,colour):
         cnf.write(string + " 0\n")
         clause_count += 1
     
-
     return(total_vars,clause_count)
