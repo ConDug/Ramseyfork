@@ -56,7 +56,7 @@ upper=${10:-0}
 
 #step 2: setp up dependencies
 dir="${n}_${p}_${q}_${t}_${s}_${b}_${r}_${a}"
-./dependency-setup.sh
+#./dependency-setup.sh
  
 #step 3 and 4: generate pre-processed instance
 dir="."
