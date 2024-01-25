@@ -24,16 +24,37 @@ Options:
     <a>: amount of additional variables to remove for each cubing call
 " && exit
 
-while getopts "pm" opt
+
+while getopts "pmd:D:E:F:" opt
 do
     case $opt in
         p) d="-p" ;;
         m) m="-m" ;;
+        d) lower=${OPTARG} ;; #lower bound on degree of blue vertices
+        D) upper=${OPTARG} ;; #upper bound on degree of blue vertices
+        E) Edge_b=${OPTARG} ;; #upper bound on triangles per blue edge
+        F) Edge_r=${OPTARG} ;; #upper bound on triangles per red edge
         *) echo "Invalid option: -$OPTARG. Only -p and -m are supported. Use -h or --help for help" >&2
            exit 1 ;;
     esac
+    
 done
 shift $((OPTIND-1))
+
+if [[ ! -v lower ]]; then
+    lower=0
+fi
+if [[ ! -v upper ]]; then
+    upper=0
+fi
+
+if [[ ! -v Edge_b ]]; then
+    Edge_b=0
+fi
+
+if [[ ! -v Edge_r ]]; then
+    Edge_r=0
+fi
 
 #step 1: input parameters
 if [ -z "$1" ]
@@ -50,25 +71,25 @@ s=${5:-2} #by default we only simplify the instance using CaDiCaL after adding n
 b=${6:-2} #by default we generate noncanonical blocking clauses in real time
 r=${7:-0} #num of var to eliminate during first cubing stage
 a=${8:-10} #amount of additional variables to remove for each cubing call
-lower=${9:-0}
-upper=${10:-0}
+#lower=${9:-0}
+#upper=${10:-0}
 
 
 #step 2: setp up dependencies
-dir="${n}_${p}_${q}_${t}_${s}_${b}_${r}_${a}"
+dir="${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}"
 #./dependency-setup.sh
  
 #step 3 and 4: generate pre-processed instance
 dir="."
 
-if [ -f constraints_${n}_${p}_${q}_${t}_${s}_${b}_${r}_${a}_final.simp.log ]
+if [ -f constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}_final.simp.log ]
 then
     echo "Instance with these parameters has already been solved."
     exit 0
 fi
 
 module load python/3.10
-./generate-simp-instance.sh $n $p $q $t $s $b $r $a $lower $upper
+./generate-simp-instance.sh $n $p $q $t $s $b $r $a $lower $upper ${Edge_b} ${Edge_r}
 
 
 
@@ -76,14 +97,14 @@ module load python/3.10
 #step 5: cube and conquer if necessary, then solve
 if [ "$r" != "0" ]
 then
-    dir="${n}_${p}_${q}_${t}_${s}_${b}_${r}_${a}"
-    ./3-cube-merge-solve-iterative-learnt.sh $d $n constraints_${n}_${p}_${q}_${t}_${s}_${b}_${r}_${a}_final.simp $dir $r $t $a
+    dir="${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}"
+    ./3-cube-merge-solve-iterative-learnt.sh $d $n constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}_final.simp $dir $r $t $a
     command="./summary-iterative.sh $dir $r $a $n"
     echo $command
     eval $command
     
 else
-    ./maplesat-solve-verify.sh $n constraints_${n}_${p}_${q}_${t}_${s}_${b}_${r}_${a}_final.simp
+    ./maplesat-solve-verify.sh $n constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}_final.simp
     #step 5.5: verify all constraints are satisfied
     #./verify.sh $n
 

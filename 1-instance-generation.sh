@@ -24,11 +24,13 @@ p=$2
 q=$3
 l=${4:-0}
 u=${5:-0}
+u_e_b=${6:-0}
+u_e_r=${7:-0}
 
 
-if [ -f constraints_${n}_${p}_${q} ]
+if [ -f constraints_${n}_${p}_${q}_${l}_${u}_${u_e_b}_${u_e_r} ]
 then
     echo "instance already generated"
 else
-    python3 gen_instance/generate.py $n $p $q $l $u #generate the instance of order n for p,q
+    python3 gen_instance/generate.py $n $p $q $l $u ${u_e_b} ${u_e_r} #generate the instance of order n for p,q
 fi

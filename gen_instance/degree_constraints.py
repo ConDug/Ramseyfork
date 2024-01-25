@@ -19,6 +19,9 @@ def gen_implication_clause(a,b):
         #clause.append("0"+"\n")
         return(clause)
 
+
+
+
 # Generate clauses encoding that between lower and upper variables in X are assigned true (using sequential counters)
 def generate_degree_clauses(X, lower, upper, start_var, cnf_file):
     global total_vars
