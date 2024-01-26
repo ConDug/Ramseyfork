@@ -10,7 +10,6 @@ shift $((OPTIND-1))
 
 n=$1 #order
 f=$2 #instance file name
-#e=$3 #exhaustive file name
 
 [ "$1" = "-h" -o "$1" = "--help" -o "$#" -ne 2 ] && echo "
 Description:
@@ -23,16 +22,12 @@ Options:
     [-l]: generate learnt clauses
     <n>: the order of the instance/number of vertices in the graph
     <f>: file name of the CNF instance to be solved
-    <e>: file name to output exhaustive SAT solutions
 " && exit
 
-if [ "$l" == "-l" ]
-then
-    echo "MapleSAT will output short learnt clause"
-    ./maplesat-ks/simp/maplesat_static $f $f.drat -perm-out=$f.perm -order=$n -no-pre -minclause -short-out=$f.unit -noncanonical-out=$f.noncanonical | tee $f.log #removed exhaustive here, -max-proof-size=3071
-else
-    ./maplesat-ks/simp/maplesat_static $f $f.drat -no-pseudo-test -perm-out=$f.perm -order=$n -no-pre -minclause | tee $f.log #removed exhaustive here -no-pseudo-test
-fi
+./maplesat-ks/simp/maplesat_static $f $f.drat -perm-out=$f.perm -order=$n -no-pre -minclause | tee $f.log #-max-proof-size=7168 
 
-# Verify DRAT proof
-#./proof-module.sh $n $f $f.verify
+if ! grep -q "UNSAT" "$f.log" || [ "$s" == "-s" ]; then
+    echo "instance not solved, no need to verify unless learnt clause or skipping verification"
+else
+    ./proof-module.sh $n $f $f.verify
+fi

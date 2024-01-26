@@ -32,8 +32,8 @@ do
         m) m="-m" ;;
         d) lower=${OPTARG} ;; #lower bound on degree of blue vertices
         D) upper=${OPTARG} ;; #upper bound on degree of blue vertices
-        E) Edge_b=${OPTARG} ;; #upper bound on triangles per blue edge
-        F) Edge_r=${OPTARG} ;; #upper bound on triangles per red edge
+        E) Edge_b=${OPTARG} ;; #upper bound on blue triangles per blue edge
+        F) Edge_r=${OPTARG} ;; #upper bound on red triangles per red edge
         *) echo "Invalid option: -$OPTARG. Only -p and -m are supported. Use -h or --help for help" >&2
            exit 1 ;;
     esac
@@ -66,45 +66,49 @@ fi
 n=$1 #order
 p=$2
 q=$3
-t=${4:-10000} #conflicts for which to simplify each time CaDiCal is called, or % of variables to eliminate
-s=${5:-2} #by default we only simplify the instance using CaDiCaL after adding noncanonical blocking clauses
-b=${6:-2} #by default we generate noncanonical blocking clauses in real time
-r=${7:-0} #num of var to eliminate during first cubing stage
-a=${8:-10} #amount of additional variables to remove for each cubing call
-#lower=${9:-0}
-#upper=${10:-0}
+t=${4:-100000} #conflicts for which to simplify each time CaDiCal is called, or % of variables to eliminate
+r=${5:-0} #num of var to eliminate during first cubing stage
+a=${6:-10} #amount of additional variables to remove for each cubing call
 
 
 #step 2: setp up dependencies
-dir="${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}"
-#./dependency-setup.sh
+dir="${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}"
+./dependency-setup.sh
  
 #step 3 and 4: generate pre-processed instance
 dir="."
 
-if [ -f constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}_final.simp.log ]
+if [ -f constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.simp.log ]
 then
     echo "Instance with these parameters has already been solved."
     exit 0
 fi
 
 module load python/3.10
-./generate-simp-instance.sh $n $p $q $t $s $b $r $a $lower $upper ${Edge_b} ${Edge_r}
+if [ -f constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r} ]
+then
+    echo "instance already generated"
+    cp constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r} constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}
+else
+    #echo $n $p $q $lower $upper $Edge_b $Edge_r
+    python3 gen_instance/generate.py $n $p $q $lower $upper $Edge_b $Edge_r #generate the instance of order n for p,q
+    cp constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r} constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}
+fi
 
-
+echo "Simplifying constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a} for" $t "conflicts using CaDiCaL+CAS"
+./simplification/simplify-by-conflicts.sh constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a} $n $t
 
 #need to fix the cubing part for directory pointer
 #step 5: cube and conquer if necessary, then solve
 if [ "$r" != "0" ]
 then
-    dir="${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}"
-    ./3-cube-merge-solve-iterative-learnt.sh $d $n constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}_final.simp $dir $r $t $a
-    command="./summary-iterative.sh $dir $r $a $n"
-    echo $command
-    eval $command
+    dir="${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}"
+    echo "Starting cubing" dir
+    ./cube-solve.sh $p $n constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.simp $dir $r $a
     
 else
-    ./maplesat-solve-verify.sh $n constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}_final.simp
+echo "Solving constraints_${n}_${p}_${q}_${lower}_${upper}.simp using MapleSAT+CAS"
+    ./maplesat-solve-verify.sh $n constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.simp
     #step 5.5: verify all constraints are satisfied
     #./verify.sh $n
 

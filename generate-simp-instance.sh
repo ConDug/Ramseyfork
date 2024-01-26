@@ -32,16 +32,14 @@ n=$1 #order
 p=$2
 q=$3
 t=${4:-100000} #conflicts for which to simplify each time CaDiCal is called, or % of variables to eliminate
-s=${5:-2} #by default we only simplify the instance using CaDiCaL after adding noncanonical blocking clauses
-b=${6:-2} #by default we generate noncanonical blocking clauses in real tim
-r=${7:-0} #cubing parameter, for naming only
-a=${8:-10} #for naming only
-lower=${9:-0}
-upper=${10:-0}
-Edge_b=${11:-0} #upper bound on triangles per blue edge
-Edge_r=${12:-0} 
+r=${5:-0} #cubing parameter, for naming only
+a=${6:-10} #for naming only
+lower=${7:-0}
+upper=${8:-0}
+Edge_b=${9:-0} #upper bound on triangles per blue edge
+Edge_r=${10:-0} 
 
-if [ -f constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}_final.simp ]
+if [ -f constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}_final.simp ]
 then
     echo "instance with the same parameter has already been generated"
     exit 0
@@ -57,16 +55,16 @@ echo $instance_tracking
 
 if [ "$s" -eq 1 ] || [ "$s" -eq 3 ]
 then
-    simp1=constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}.simp1 
-    cp $instance_tracking constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}${Edge_r}_${t}_${s}_${b}_${r}_${a}
+    simp1=constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.simp1 
+    cp $instance_tracking constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}${Edge_r}_${t}_${r}_${a}
 
     if [ -f $simp1 ]
     then
         echo "$simp1 already exist, skip simplification"
     else
-        ./simplification/simplify-by-conflicts.sh constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a} $n $t
-        mv constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}.simp $simp1
-        rm constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}
+        ./simplification/simplify-by-conflicts.sh constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a} $n $t
+        mv constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.simp $simp1
+        rm constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}
     instance_tracking=$simp1
     fi
 fi
@@ -77,7 +75,7 @@ fi
 
 #step 4: generate non canonical subgraph
 
-simp_non=constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${s}_${b}_${r}_${a}.noncanonical
+simp_non=constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.noncanonical
 
 if [ "$b" -eq 2 ]
 then

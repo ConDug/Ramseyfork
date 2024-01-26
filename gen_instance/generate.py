@@ -34,9 +34,9 @@ def generate(n, p, q,lower=0,upper=0, u_e_b=0, u_e_r=0):
            f.write(constraint + "0" + "\n")
 
 
-    #count,clause_count= cubic(n, math.comb(n,2),f"constraints_temp_{n}_{p}_{q}_{lower}_{upper}_{u_e_b}_{u_e_r}") # write cubic constraints to file and count their total variables, and num_cubic constriants
-    clause_count =0
-    count=math.comb(n,2)
+    count,clause_count= cubic(n, math.comb(n,2),f"constraints_temp_{n}_{p}_{q}_{lower}_{upper}_{u_e_b}_{u_e_r}") # write cubic constraints to file and count their total variables, and num_cubic constriants
+    #clause_count =0
+    #count=math.comb(n,2)
     #print(count,clause_count)
     
     if lower>0:
@@ -47,20 +47,22 @@ def generate(n, p, q,lower=0,upper=0, u_e_b=0, u_e_r=0):
             count=deg_count #+= built into generate_degree_clauses
 
     if u_e_b>0:
+        print('blue triangle constraints')
         for i in range(1,n*(n-1)//2+1):
             X=set(range(1,n+1)) - set(list(edge_dict.keys())[list(edge_dict.values()).index(i)])#select all vertices except on i'th edge
             #print(X)
             edge_count,edge_clause=generate_triangle_clauses(X,u_e_b,count,f"constraints_temp_{n}_{p}_{q}_{lower}_{upper}_{u_e_b}_{u_e_r}",colour='b')
-            print('edges_blue',edge_count)
+            #print('edges_blue',edge_count)
             clause_count +=edge_clause
             count=edge_count #+= built into generate_degree_clauses
 
     if u_e_r>0:
+        print('red triangle constraints')
         for i in range(1,n*(n-1)//2+1):
             X=set(range(1,n+1)) - set(list(edge_dict.keys())[list(edge_dict.values()).index(i)])#select all vertiecs expect on i'th edge
             #print(X)
             edge_count,edge_clause=generate_triangle_clauses(X,u_e_r,count,f"constraints_temp_{n}_{p}_{q}_{lower}_{upper}_{u_e_b}_{u_e_r}",colour='r')
-            print('edges_red',edge_count)
+            #print('edges_red',edge_count)
             clause_count +=edge_clause
             count=edge_count #+= built into generate_degree_clauses
 
