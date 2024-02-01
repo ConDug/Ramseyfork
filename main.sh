@@ -102,12 +102,9 @@ echo "Simplifying constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_
 #step 5: cube and conquer if necessary, then solve
 if [ "$r" != "0" ]
 then
-    dir="${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}"
-    echo "Starting cubing" dir
     ./cube-solve.sh $p $n constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.simp $dir $r $a
-    
 else
-echo "Solving constraints_${n}_${p}_${q}_${lower}_${upper}.simp using MapleSAT+CAS"
+    echo "Solving constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.simp using MapleSAT+CAS"
     ./maplesat-solve-verify.sh $n constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.simp
     #step 5.5: verify all constraints are satisfied
     #./verify.sh $n
