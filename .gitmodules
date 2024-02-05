@@ -1,0 +1,3 @@
+[submodule "cadical-ks"]
+	path = cadical-ks
+	url = https://github.com/curtisbright/cadical-ks
