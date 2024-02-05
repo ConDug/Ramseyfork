@@ -4,22 +4,22 @@
 [ "$1" = "-h" -o "$1" = "--help" ] && echo "
 Description:
     Updated on 2023-01-25
-    This is a driver script that handles generating the SAT encoding, generating non-canonical subgraph blocking clauses,
-    simplify instance using CaDiCaL, solve the instance using maplesat-ks, then finally determine if a KS system exists for a certain order.
+    This is a driver script that handles generating the SAT encoding,  simplify instance using CaDiCaL, solve the instance using maplesat-ks.
 
 Usage:
-    ./main.sh [-p] [-m] n t s b r
-    If only parameter n is provided, default run ./main.sh n 10000 2 2 0 10
+    ./main.sh [-p] [-m] [-d] [-D] [-E] [-F] n p q t s b r
+    If only parameter n,p,q are provided, default run ./main.sh n p q 100000 0 10
 
 Options:
-    [-d]: cubing/solving in parallel
+    [-p]: cubing/solving in parallel
+    [-d]: lower bound on number of (colour 1) edges
+    [-D]: upper bound on number of (colour 1) edges
+    [-E]: upper bound on number of monochromatic triangles on a colour 1 edges
+    [-F]: upper bound on number of monochromatic triangles on a colour 2 edges
     <n>: the order of the instance/number of vertices in the graph
-    <p>:
-    <q>:
-    <o>: simplification option, option c means simplifying for t conflicts, option v means simplify until t% of variables are eliminated
+    <p>: colour 1 cliques to block in encoding
+    <q>: colour 2 cliques to block in encoding
     <t>: conflicts for which to simplify each time CaDiCal is called
-    <s>: option for simplification, takes in argument 1 (before adding noncanonical clauses), 2 (after), 3(both)
-    <b>: option for noncanonical blocking clauses, takes in argument 1 (pre-generated), 2 (real-time-generation), 3 (no blocking clauses)
     <r>: number of variable to remove in cubing, if not passed in, assuming no cubing needed
     <a>: amount of additional variables to remove for each cubing call
 " && exit
@@ -84,7 +84,7 @@ then
     exit 0
 fi
 
-module load python/3.10
+
 if [ -f constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r} ]
 then
     echo "instance already generated"
@@ -109,10 +109,9 @@ else
     #step 5.5: verify all constraints are satisfied
     #./verify.sh $n
 
-    #step 6: 
+    #step 6: only relevant for SAT case
     echo "checking max clique size..."
     ./4-check-clique-size.sh $n $p $q
 
 fi
 
-#summary.sh?
