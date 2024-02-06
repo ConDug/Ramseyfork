@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account=def-vganesh
-#SBATCH --time=120:00:00
+#SBATCH --time=02:00:00
 #SBATCH --mem-per-cpu=4G
 #SBATCH --nodes=1
 #SBATCH --constraint=broadwell
@@ -44,5 +44,5 @@ t=${4:-100000} #conflicts for which to simplify each time CaDiCal is called, or 
 r=${5:-0} #number of variables to eliminate until the cubing terminates
 a=${6:-10}
 
-
+module load python/3.10
 ./main.sh $d "-d" $lower "-D" $upper "-E" $Edge_b "-F" $Edge_r $n $p $q $t $r $a $lower $upper
