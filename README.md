@@ -1,12 +1,8 @@
-`embedability`: check whether kochen specker candidates are embedable, if a candidate is indeed embedable, it is a Kochen Specker graph as desired, can be ran using 4-check-embedability.sh
-
 `gen_cubes`: generate the cubes used in cube and conquer, merge cubes into the instance then solve using MapleSAT, can be ran using 3-cube-merge-solve.sh
 
 `gen_instance`: include scripts that generate SAT instance of certain order with satisfying certain contraints, can be ran using 1-instance-generation.sh
 
 `maplesat-ks`: MapleSAT solver with orderly generation (SAT + CAS)
-
-`non_can`: pre-generated noncanonical blocking clauses that can be added to the instance
 
 `simplification`: contains script relavant to simplification in the pipeline
 
