@@ -25,7 +25,7 @@ Options:
 " && exit
 
 
-while getopts "pmd:D:E:F:" opt
+while getopts "pmd:D:E:F:P" opt
 do
     case $opt in
         p) d="-p" ;;
@@ -34,6 +34,7 @@ do
         D) upper=${OPTARG} ;; #upper bound on degree of blue vertices
         E) Edge_b=${OPTARG} ;; #upper bound on blue triangles per blue edge
         F) Edge_r=${OPTARG} ;; #upper bound on red triangles per red edge
+        P) mpcf="MPCF" ;;
         *) echo "Invalid option: -$OPTARG. Only -p and -m are supported. Use -h or --help for help" >&2
            exit 1 ;;
     esac
@@ -56,6 +57,10 @@ if [[ ! -v Edge_r ]]; then
     Edge_r=0
 fi
 
+if [[ ! -v mpcf ]]; then
+    mpcf=0
+fi
+
 #step 1: input parameters
 if [ -z "$1" ]
 then
@@ -72,40 +77,41 @@ a=${6:-10} #amount of additional variables to remove for each cubing call
 
 
 #step 2: setp up dependencies
-dir="${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}"
+dir="${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${mpcf}_${t}_${r}_${a}"
+cnf="constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${mpcf}"
 ./dependency-setup.sh
  
 #step 3 and 4: generate pre-processed instance
 dir="."
 
-if [ -f constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.simp.log ]
+if [ -f ${cnf}_${t}_${r}_${a}.simp.log ]
 then
     echo "Instance with these parameters has already been solved."
     exit 0
 fi
 
 
-if [ -f constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r} ]
+if [ -f ${cnf} ]
 then
     echo "instance already generated"
-    cp constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r} constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}
+    cp ${cnf} ${cnf}_${t}_${r}_${a}
 else
     #echo $n $p $q $lower $upper $Edge_b $Edge_r
-    python3 gen_instance/generate.py $n $p $q $lower $upper $Edge_b $Edge_r #generate the instance of order n for p,q
-    cp constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r} constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}
+    python3 gen_instance/generate.py $n $p $q $lower $upper $Edge_b $Edge_r ${mpcf} #generate the instance of order n for p,q
+    cp ${cnf} ${cnf}_${t}_${r}_${a}
 fi
 
-echo "Simplifying constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a} for" $t "conflicts using CaDiCaL+CAS"
-./simplification/simplify-by-conflicts.sh constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a} $n $t
+echo "Simplifying ${cnf}_${t}_${r}_${a} for" $t "conflicts using CaDiCaL+CAS"
+./simplification/simplify-by-conflicts.sh ${cnf}_${t}_${r}_${a} $n $t
 
 #need to fix the cubing part for directory pointer
 #step 5: cube and conquer if necessary, then solve
 if [ "$r" != "0" ]
 then
-    ./cube-solve.sh $p $n constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.simp $dir $r $a
+    ./cube-solve.sh $p $n ${cnf}_${t}_${r}_${a}.simp $dir $r $a
 else
-    echo "Solving constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.simp using MapleSAT+CAS"
-    ./maplesat-solve-verify.sh $n constraints_${n}_${p}_${q}_${lower}_${upper}_${Edge_b}_${Edge_r}_${t}_${r}_${a}.simp
+    echo "Solving ${cnf}_${t}_${r}_${a}.simp using MapleSAT+CAS"
+    ./maplesat-solve-verify.sh $n ${cnf}_${t}_${r}_${a}.simp
     #step 5.5: verify all constraints are satisfied
     #./verify.sh $n
 
