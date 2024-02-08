@@ -37,10 +37,6 @@ if [[ ! -v Edge_r ]]; then
     Edge_r=0
 fi
 
-if [[ ! -v mpcf ]]; then
-    mpcf=0
-fi
-
 
 n=$1 #order
 p=$2
