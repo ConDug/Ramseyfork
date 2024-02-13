@@ -10,7 +10,6 @@ from min_pclique_free import max_pclique_free
 
 #requires that the cnf file does not exist
 def generate(n, p, q,lower=0,upper=0, u_e_b=0, u_e_r=0,mpcf=0):
-
     vertices=range(1,n+1)
     edge_dict={}
     edge_counter=0
@@ -65,7 +64,8 @@ def generate(n, p, q,lower=0,upper=0, u_e_b=0, u_e_r=0,mpcf=0):
             clause_count +=edge_clause
             count=edge_count #+= built into generate_degree_clauses
 
-    if mpcf:
+    if int(mpcf)!=0:
+        print('Using MPCF constraints')
         mtf_count,mtf_clause=max_pclique_free(n,p,count,f"constraints_temp_{n}_{p}_{q}_{lower}_{upper}_{u_e_b}_{u_e_r}_{mpcf}")
         clause_count+=mtf_clause
         count=mtf_count
