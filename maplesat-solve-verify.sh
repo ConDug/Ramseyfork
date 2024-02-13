@@ -24,8 +24,8 @@ Options:
     <f>: file name of the CNF instance to be solved
 " && exit
 
-./maplesat-ks/simp/maplesat_static $f $f.drat -perm-out=$f.perm -order=$n -no-pre -minclause | tee $f.log #-max-proof-size=7168 
-
+#./maplesat-ks/simp/maplesat_static $f $f.drat -perm-out=$f.perm -order=$n -no-pre -minclause | tee $f.log #-max-proof-size=7168 
+./maplesat-ks/simp/maplesat_static $f $f.drat -exhaustive=$f.exhaust -perm-out=$f.perm -order=$n -no-pre -minclause > $f.log 2>&1
 if ! grep -q "UNSAT" "$f.log" || [ "$s" == "-s" ]; then
     echo "instance not solved, no need to verify unless learnt clause or skipping verification"
 else
