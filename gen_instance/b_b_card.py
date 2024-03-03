@@ -21,7 +21,7 @@ def gen_implication_clause(a,b):
         return(clause)
 
 def generate_edge_clauses(X, lower, upper, start_var, cnf_file):
-
+    #print(X, start_var)
     start_var=start_var+len(X)+1#first len(X) vars will be used for root
     class Node():
         counter=0 #Nodes count from 1... may not be needed
@@ -53,6 +53,7 @@ def generate_edge_clauses(X, lower, upper, start_var, cnf_file):
             self.left=math.floor(self.value/2)
             self.right=self.value-self.left
             self.variables=list(range(start_var-len(X),start_var))#root uses first len(X) vars, output vars in paper
+            print(self.variables)
             
     class Tree():
         def __init__(self, val):
@@ -118,8 +119,8 @@ def generate_edge_clauses(X, lower, upper, start_var, cnf_file):
             clauses.append(tree_n.nodes['0'].variables[i])
         elif i>upper-1:
             clauses.append(-tree_n.nodes['0'].variables[i])
-
-    print('Clauses added: ',len(clauses))
+    clauses.append(['iii'])
+    #print('Clauses added: ',len(clauses))
 
     cnf = open(cnf_file, 'a+')
     for clause in clauses:
