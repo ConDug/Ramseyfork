@@ -94,24 +94,20 @@ def generate_edge_clauses(X, lower, upper, start_var, cnf_file):
     for node in tree_n.nodes:
         #print(node) #-node is the key
         if tree_n.nodes[node].value>0: #ignore leaves
-            #print(tree_n.nodes[node].variables)
-            sigma=copy.deepcopy(tree_n.nodes[node].variables)
-            sigma.append('T')
-            alpha=copy.deepcopy(tree_n.nodes[node+'0'].variables)
-            alpha.append('T')
-            beta=copy.deepcopy(tree_n.nodes[node+'1'].variables)
-            beta.append('T')
-
-            [clauses.append(gen_implication_clause({a,b},{r})) for a in alpha for b in beta for r in sigma]
-
-            sigma=copy.deepcopy(tree_n.nodes[node].variables)
-            sigma.append('F')
-            alpha=copy.deepcopy(tree_n.nodes[node+'0'].variables)
-            alpha.append('F')
-            beta=copy.deepcopy(tree_n.nodes[node+'1'].variables)
-            beta.append('F')
-
-            [clauses.append(gen_implication_clause({r},{a,b})) for a in alpha for b in beta for r in sigma]
+             sigma=copy.deepcopy(ff.nodes[node].variables)
+        sigma=['T']+sigma+['F']
+        alpha=copy.deepcopy(ff.nodes[node+'0'].variables)
+        alpha=['T']+alpha+['F']
+        beta=copy.deepcopy(ff.nodes[node+'1'].variables)
+        beta=['T']+beta+['F']
+        
+        for a in range(0,len(alpha)):
+            for b in range(0,len(beta)):
+                for r in range(0,len(sigma)):
+                    if a+b==r:
+                        #print(a,b,r)
+                        clauses.append(gen_implication_clause({alpha[a],beta[b]},{sigma[r]}))
+                        clauses.append(gen_implication_clause({sigma[r]},{alpha[a],beta[b]}))
     clauses = [i for i in clauses if i is not None]
 
     for i in range(len(X)):
