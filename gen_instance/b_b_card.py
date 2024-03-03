@@ -36,7 +36,7 @@ def generate_edge_clauses(X, lower, upper, start_var, cnf_file):
             Node.var_counter+=self.value
 
     class Leaf():
-        value=-1
+        value=1
         left=None
         right=None
         counter_leaf=0 #Leaves count from 1
@@ -53,7 +53,7 @@ def generate_edge_clauses(X, lower, upper, start_var, cnf_file):
             self.left=math.floor(self.value/2)
             self.right=self.value-self.left
             self.variables=list(range(start_var-len(X),start_var))#root uses first len(X) vars, output vars in paper
-            print(self.variables)
+            #print(self.variables)
             
     class Tree():
         def __init__(self, val):
@@ -93,21 +93,21 @@ def generate_edge_clauses(X, lower, upper, start_var, cnf_file):
     clauses=[]
     for node in tree_n.nodes:
         #print(node) #-node is the key
-        if tree_n.nodes[node].value>0: #ignore leaves
-             sigma=copy.deepcopy(ff.nodes[node].variables)
-        sigma=['T']+sigma+['F']
-        alpha=copy.deepcopy(ff.nodes[node+'0'].variables)
-        alpha=['T']+alpha+['F']
-        beta=copy.deepcopy(ff.nodes[node+'1'].variables)
-        beta=['T']+beta+['F']
+        if tree_n.nodes[node].value>1: #ignore leaves
+            sigma=copy.deepcopy(tree_n.nodes[node].variables)
+            sigma=['T']+sigma+['F']
+            alpha=copy.deepcopy(tree_n.nodes[node+'0'].variables)
+            alpha=['T']+alpha+['F']
+            beta=copy.deepcopy(tree_n.nodes[node+'1'].variables)
+            beta=['T']+beta+['F']
         
-        for a in range(0,len(alpha)):
-            for b in range(0,len(beta)):
-                for r in range(0,len(sigma)):
-                    if a+b==r:
-                        #print(a,b,r)
-                        clauses.append(gen_implication_clause({alpha[a],beta[b]},{sigma[r]}))
-                        clauses.append(gen_implication_clause({sigma[r]},{alpha[a],beta[b]}))
+            for a in range(0,len(alpha)):
+                for b in range(0,len(beta)):
+                    for r in range(0,len(sigma)):
+                        if a+b==r:
+                            #print(a,b,r)
+                            clauses.append(gen_implication_clause({alpha[a],beta[b]},{sigma[r]}))
+                            clauses.append(gen_implication_clause({sigma[r]},{alpha[a],beta[b]}))
     clauses = [i for i in clauses if i is not None]
 
     for i in range(len(X)):
@@ -115,7 +115,7 @@ def generate_edge_clauses(X, lower, upper, start_var, cnf_file):
             clauses.append(tree_n.nodes['0'].variables[i])
         elif i>upper-1:
             clauses.append(-tree_n.nodes['0'].variables[i])
-    clauses.append(['iii'])
+
     #print('Clauses added: ',len(clauses))
 
     cnf = open(cnf_file, 'a+')
